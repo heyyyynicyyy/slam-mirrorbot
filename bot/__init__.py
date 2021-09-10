@@ -38,9 +38,9 @@ CONFIG_FILE_URL = os.environ.get('CONFIG_FILE_URL', None)
 if CONFIG_FILE_URL is not None:
     res = requests.get(CONFIG_FILE_URL)
     if res.status_code == 200:
-        with open('config.env', 'wb') as f:
-           f.truncate(0)
-           f.write(res.content)
+        with open('config.env', 'wb+') as f:
+            f.write(res.content)
+            f.close()
     else:
         logging.error(res.status_code)
 
@@ -353,9 +353,9 @@ try:
     else:
         res = requests.get(TOKEN_PICKLE_URL)
         if res.status_code == 200:
-            with open('token.pickle', 'wb') as f:
-               f.truncate(0)
-               f.write(res.content)
+            with open('token.pickle', 'wb+') as f:
+                f.write(res.content)
+                f.close()
         else:
             logging.error(res.status_code)
             raise KeyError
@@ -368,9 +368,9 @@ try:
     else:
         res = requests.get(ACCOUNTS_ZIP_URL)
         if res.status_code == 200:
-            with open('accounts.zip', 'wb') as f:
-               f.truncate(0)
-               f.write(res.content)
+            with open('accounts.zip', 'wb+') as f:
+                f.write(res.content)
+                f.close()
         else:
             logging.error(res.status_code)
             raise KeyError
@@ -385,9 +385,9 @@ try:
     else:
         res = requests.get(MULTI_SEARCH_URL)
         if res.status_code == 200:
-            with open('drive_folder', 'wb') as f:
-               f.truncate(0)
-               f.write(res.content)
+            with open('drive_folder', 'wb+') as f:
+                f.write(res.content)
+                f.close()
         else:
             logging.error(res.status_code)
             raise KeyError
@@ -400,9 +400,12 @@ if os.path.exists('drive_folder'):
     with open('drive_folder', 'r+') as f:
         lines = f.readlines()
         for line in lines:
-            temp = line.strip().split()
-            DRIVES_NAMES.append(temp[0].replace("_", " "))
-            DRIVES_IDS.append(temp[1])
+            try:
+                temp = line.strip().split()
+                DRIVES_IDS.append(temp[1])
+                DRIVES_NAMES.append(temp[0].replace("_", " "))
+            except:
+                DRIVES_NAMES.append(None)
             try:
                 INDEX_URLS.append(temp[2])
             except IndexError as e:
